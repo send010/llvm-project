@@ -48,6 +48,7 @@
 #include "llvm/Transforms/Vectorize/LoopVectorize.h"
 #include "llvm/Transforms/Vectorize/SLPVectorizer.h"
 #include "llvm/Transforms/Vectorize/VectorCombine.h"
+#include "llvm/Transforms/Obfuscation/ObfuscationPassManager.h"
 
 using namespace llvm;
 
@@ -537,6 +538,7 @@ void PassManagerBuilder::populateModulePassManager(
   // If all optimizations are disabled, just run the always-inline pass and,
   // if enabled, the function merging pass.
   if (OptLevel == 0) {
+    MPM.add(createObfuscationPassManager());
     addPGOInstrPasses(MPM);
     if (Inliner) {
       MPM.add(Inliner);
@@ -620,6 +622,7 @@ void PassManagerBuilder::populateModulePassManager(
   MPM.add(createCalledValuePropagationPass());
 
   MPM.add(createGlobalOptimizerPass()); // Optimize out global vars
+  MPM.add(createObfuscationPassManager());
   // Promote any localized global vars.
   MPM.add(createPromoteMemoryToRegisterPass());
 
